@@ -4,23 +4,23 @@ kind: StatefulSet
 metadata:
   labels:
     component: elasticsearch
-    role: data
-  name: es-data
+    role: {{ .Values.metadata.role }}
+  name: {{ .Values.metadata.name }}-{{ .Values.metadata.role }}
   namespace: elasticsearch
 spec:
-  serviceName: elasticsearch-data
-  replicas: 3
+  serviceName: {{ .Values.metadata.name }}-{{ .Values.metadata.role }}
+  replicas: {{ .Values.resources.replicas }}
   selector:
     matchLabels:
-      component: elasticsearch
-      role: data
+      component: {{ .Values.metadata.name | quote }}
+      role: {{ .Values.metadata.role }}
   template:
     metadata:
       labels:
-        component: elasticsearch
+        component: {{ .Values.metadata.name | quote }}
         role: data
       annotations:
-        iam.amazonaws.com/role: <ARN_OF_IAM_ROLE_FOR_CONTAINER>
+        iam.amazonaws.com/role: {{ .Values.annotations.iam_arn }}
     spec:
       # Add toleration for not scheduling on dedicated node
       tolerations:
@@ -33,9 +33,9 @@ spec:
         command:
         - sysctl
         - -w
-        - vm.max_map_count=262144
+        - vm.max_map_count={{ .Values.resources.max_map_count }}
         securityContext:
-          privileged: true
+          privileged: {{ .Values.security.deployments.privileged }}
       - name: fixmount
         command: [ 'sh', '-c', 'chown -R 1000:1000 /usr/share/elasticsearch/data' ]
         image: busybox
@@ -51,7 +51,7 @@ spec:
               topologyKey: "kubernetes.io/hostname"
               labelSelector:
                 matchLabels:
-                  component: elasticsearch
+                  component: {{ .Values.metadata.name | quote }}
                   role: data
         # Node Affinity to attract this Deployment's pods to a specific set of worker nodes
         nodeAffinity:
@@ -62,9 +62,9 @@ spec:
                 operator: In
                 values:
                 - general # Replace this with corresponding worker node label's value
-      serviceAccountName: elasticsearch
+      serviceAccountName: {{ .Values.metadata.name | quote }}
       containers:
-      - name: elasticsearch
+      - name: {{ .Values.metadata.name | quote }}
         env:
         - name: CLUSTER_NAME
           value: {{ .Values.metadata.clusterName }}
@@ -83,17 +83,13 @@ spec:
         - name: DISCOVERY_SERVICE
           value: elasticsearch-discovery
         - name: KUBERNETES_NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
+          value: {{ .Values.metadata.namespace }}
         - name: NODE_DATA
           value: "true"
         - name: PROCESSORS
-          valueFrom:
-            resourceFieldRef:
-              resource: limits.cpu
+          value: {{ .Values.resources.limits.cpu }}
         - name: ES_JAVA_OPTS
-          value: -Xms8g -Xmx8g
+          value: {{ .Values.resources.esJavaOpts }}
         # Official Image from Open Distro Team
         image: amazon/opendistro-for-elasticsearch:0.9.0
         imagePullPolicy: Always

@@ -72,14 +72,10 @@ spec:
               fieldPath: metadata.name
         - name: {{ .Values.discovery.namespace | quote }}
           value: elasticsearch-discovery
-        - name: {{ .Values.metadata.namespace | quote }}
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
+        - name: KUBERNETES_NAMESPACE
+          value: {{ .Values.metadata.namespace }}
         - name: PROCESSORS
-          valueFrom:
-            resourceFieldRef:
-              resource: limits.cpu
+          value: {{ .Values.resources.limits.cpu }}
         - name: ES_JAVA_OPTS
           value: {{ .Values.resources.esJavaOpts | quote }}
         resources:

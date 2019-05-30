@@ -5,28 +5,19 @@ metadata:
   roleName: es-ingest
   role: ingest
 
-containers:
-  image: amazon/opendistro-for-elasticsearch
-  imageTag: 0.9.0
-  pullPolicy: Always
-
-annotations:
-  external_dns: elk.sec.example.com
+roles:
+  master: false
+  ingest: true
+  data: false
 
 discovery:
   name: elasticsearch-discovery
   role: master
   clusterIP: None
 
-security:
-  ports:
-    httpPort: 9200
-    transportPort: 9300
-    metricsPort: 9600
-  deployments:
-    privileged: true
-
 resources:
+  replicas: 3
+  esJavaOpts: "-Xms6g -Xmx6g"
   max_map_count: 262144
   requests:
     memory: 12Gi
@@ -34,11 +25,6 @@ resources:
   limits:
     memory: 12Gi
     cpu: 2
-
-roles:
-  master: false
-  ingest: true
-  data: false
 
 environmentalVariables:
   CLUSTER_NAME: "testing"

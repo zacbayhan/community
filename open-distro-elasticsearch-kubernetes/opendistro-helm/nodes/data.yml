@@ -5,28 +5,19 @@ metadata:
   roleName: es-data
   role: data
 
-containers:
-  image: amazon/opendistro-for-elasticsearch
-  imageTag: 0.9.0
-  pullPolicy: Always
-
-annotations:
-  external_dns: elk.sec.example.com
+roles:
+  master: false
+  ingest: false
+  data: true
 
 discovery:
   name: elasticsearch-discovery
   role: master
   clusterIP: None
 
-security:
-  ports:
-    httpPort: 9200
-    transportPort: 9300
-    metricsPort: 9600
-  deployments:
-    privileged: true
-
 resources:
+  replicas: 3
+  esJavaOpts: "-Xms16g -Xmx16g"
   max_map_count: 262144
   requests:
     memory: 12Gi
@@ -35,12 +26,8 @@ resources:
     memory: 12Gi
     cpu: 2
 
-roles:
-  master: false
-  ingest: false
-  data: true
-
 environmentalVariables:
+  CLUSTER_NAME: "testing"
   NUMBER_OF_MASTERS: "3"
   NETWORK_HOST: "0.0.0.0"
   TRANSPORT_TLS_PEM_PASS: "REPLACE_WITH_TLS_PRIVATE_KEY_PASSPHRASE" # Replace this with the passphrase for the TLS private key
