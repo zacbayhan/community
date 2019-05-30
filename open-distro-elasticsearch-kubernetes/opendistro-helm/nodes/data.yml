@@ -1,13 +1,9 @@
-# Default values for opendistro-helm.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 metadata:
   name: elasticsearch
   clusterName: elasticsearch
-  namespace: elasticsearch
-  roleName: es-master
-  role: master
+  namespace: elasticsearch-namespace
+  roleName: es-data
+  role: data
 
 containers:
   image: amazon/opendistro-for-elasticsearch
@@ -31,7 +27,6 @@ security:
     privileged: true
 
 resources:
-  esJavaOpts: "-Xms6g -Xmx6g"
   max_map_count: 262144
   requests:
     memory: 12Gi
@@ -41,12 +36,11 @@ resources:
     cpu: 2
 
 roles:
-  master: true
+  master: false
   ingest: false
-  data: false
+  data: true
 
 environmentalVariables:
-  CLUSTER_NAME: "testing"
   NUMBER_OF_MASTERS: "3"
   NETWORK_HOST: "0.0.0.0"
   TRANSPORT_TLS_PEM_PASS: "REPLACE_WITH_TLS_PRIVATE_KEY_PASSPHRASE" # Replace this with the passphrase for the TLS private key
