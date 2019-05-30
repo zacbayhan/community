@@ -1,0 +1,21 @@
+# Default values for opendistro-helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+metadata:
+  name: elasticsaerch
+  namespace: elasticsaerch-namespace
+
+annotations:
+  external_dns: elk.sec.example.com
+
+discovery:
+  name: elasticsearch-discovery
+  role: master
+  clusterIP: None
+
+security:
+  ports:
+    httpPort: 9200
+    transportPort: 9300
+    metricsPort: 9600

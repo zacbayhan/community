@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.discovery.name | quote }}
+  namespace: {{ .Values.metadata.namespace | quote }}
+  labels:
+    component: {{ .Values.metadata.name | quote }}
+    role: {{ .Values.discovery.role }}
+spec:
+  selector:
+    component: {{ .Values.metadata.name | quote }}
+    role: {{ .Values.discovery.role | quote }}
+  ports:
+  - name: transport
+    port: {{ .Values.security.ports.transportPort }}
+    protocol: TCP
+  clusterIP: {{ .Values.discovery.clusterIP }}
